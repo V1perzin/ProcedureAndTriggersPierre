@@ -1,0 +1,59 @@
+Crie a base de dados a seguir:
+
+SerHumano(Matricula, Nome, Endereço)
+
+Curso(Id, NomeCurso, DuracaoPeriodos)
+
+Professor(MatProf, Titulacao, DtAdm, Salario, CursoId)
+
+MatProf referencia SerHumano
+
+CursoId referencia Curso
+
+Aluno(MatAlu, PeriodoEntrada, Cidade, UF, IdCurso)
+
+MatAlu referencia SerHumano
+
+IdCurso referencia Curso
+
+Disciplina(Codigo, NomeDisc, Creditos)
+
+Ensina(ProfMat, DisCod, Periodo) ProfMat referencia Professor
+DisCod referencia Disciplina
+
+Matriculado(AluMat, CodDisc, PeriodoMatricula, Unidade1, Unidade2, Unidade3, Final, Media)
+AluMat referencia Aluno
+
+CodDisc referencia Disciplina
+
+Recados(Numero, Msg)
+- Qualquer campo que se trate de um período deve ser do tipo DECIMAL, e você preenche com 5 e 1... Indicando que tem 5 dígitos dos quais 1 é decimal;
+- Salário tem de ser do tipo DECIMAL, preenchendo com 10 e 2 (10 dígitos dos quais 2 são casas decimais); Unidade1, Unidade2, Unidade3, Final e Média são notas que o aluno tirou naquela disciplina, naquele período, logo são do tipo DECIMAL, com 3 e 1 (3 dígitos, dos quais 1 é decimal);
+- Como o SGBD não permite que mensagens sejam impressas na tela, você deve inserir as mensagens na tabela Recados. A tabela Recado possui uma chave primária que é um inteiro simples. NÃO USE ATUTO-INCREMENT neste campo. Sempre que você for incluir uma nova mensagem na tabela recado, você precisa calcular qual o próximo número da sequência que será a chave primária desta tabela, sabendo que este número é sempre maior em uma unidade do que o último incluído. Você precisa descobrir qual será o valor da próxima chave primária e passar esse valor numa variável no comando INSERT, juntamente com a mensagem a ser inserida. Considere que é impossível deletar tuplas nessa tabela. Supondo que há 4 tuplas na tabela Recados, a próxima tupla teria de ter CP com valor 5. É preciso calcular esse valor dentro de uma variável para passar essa variável no INSERT. Ex.:
+DECLARE índice INT;
+#calcula o valor de índice
+INSERT INTO Recados (Numero, Msg) VALUES (índice, ‘Mensagem de teste’);
+
+- 1) Escreva a Stored Procedure (SP) que mostra por professor o nome do professor, a matrícula dele e quantas disciplinas ele ministra;
+
+CREATE PROCEDURE questao01()
+BEGIN
+    -- Seleciona o nome do ser humano, a matrícula do professor e a quantidade de registros encontrados
+    SELECT s.nome, e.profmat, COUNT(*)
+    FROM serhumano s, professor p, ensina e
+    WHERE p.matprof = s.matricula -- Relaciona professor com serhumano
+    AND e.profmat = p.matprof     -- Relaciona ensina com professor
+    GROUP BY p.matprof;           -- Agrupa pelo professor
+END;
+
+-- Versão mais curta
+
+CREATE PROCEDURE questao01
+BEGIN
+    -- Seleciona o nome do ser humano, a matrícula do professor e a quantidade de registros encontrados
+    SELECT s.nome, e.profmat, COUNT(*)
+    FROM serhumano s, ensina e
+    WHERE e.profmat = s.matricula -- Relaciona ensina com serhumano (assumindo que serhumano é professor)
+    GROUP BY e.profmat;           -- Agrupa pelo professor
+END;
+
